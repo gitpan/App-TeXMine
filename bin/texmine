@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict; use warnings;
 use 5.14.1;
-use App::Rad qw/+App::texmine/;
+use App::Rad qw/+App::TeXMine/;
 App::Rad->run();
 
 sub img

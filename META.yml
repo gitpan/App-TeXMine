@@ -17,9 +17,9 @@ name: App-TeXMine
 provides:
   App::TeXMine:
     file: lib/App/TeXMine.pm
-    version: 0.01_01
+    version: 0.01_02
 requires:
-  perl: 5.01
+  perl: 5.014
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01_01
+version: 0.01_02
