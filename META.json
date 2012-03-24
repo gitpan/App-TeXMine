@@ -34,7 +34,7 @@
    "provides" : {
       "App::TeXMine" : {
          "file" : "lib/App/TeXMine.pm",
-         "version" : "0.01_03"
+         "version" : "0.01_04"
       }
    },
    "release_status" : "testing",
@@ -43,5 +43,7 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01_03"
+   "version" : "0.01_04",
+   "x_bugtracker" : "http://github.com/andrefs/app-texmine/issues",
+   "x_repository" : "http://github.com/andrefs/app-texmine"
 }
