@@ -34,16 +34,20 @@
    "provides" : {
       "App::TeXMine" : {
          "file" : "lib/App/TeXMine.pm",
-         "version" : "0.01_04"
+         "version" : "0.01_05"
       }
    },
    "release_status" : "testing",
    "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/andrefs/app-texmine/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "http://github.com/andrefs/app-texmine"
+      }
    },
-   "version" : "0.01_04",
-   "x_bugtracker" : "http://github.com/andrefs/app-texmine/issues",
-   "x_repository" : "http://github.com/andrefs/app-texmine"
+   "version" : "0.01_05"
 }
