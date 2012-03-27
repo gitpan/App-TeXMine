@@ -1,5 +1,27 @@
-Revision history for App-texmine
+Changelog for App-TeXMine
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.01_06 2012-03-27T13:59:54
+ [André Santos <andrefs@cpan.org>]
+ - updated gitignore
+
+ - lcb
+
+ - Migrated to Dist::Zilla
+
+ - fixed github
+
+ - added github to Build.PL
+
+ - better documentation, link to github
+
+ - s/App::texmine/App::TeXMine
+
+ - lcb
+
+ - url, img, bib and index (TODO: alias and tests)
+
+ - gitignore
+
+ - first commit
+
 

@@ -1,40 +1,15 @@
-package App::TeXMine;
 
 use 5.014;
 use strict;
+package App::TeXMine;
+{
+  $App::TeXMine::VERSION = '0.01_06';
+}
 use warnings;
 use feature 'say';
 
-=head1 NAME
+# ABSTRACT: extract information from LaTeX files
 
-App::TeXMine - extract information from LaTeX files
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01_05';
-
-
-=head1 SYNOPSIS
-
-texmine command file.tex
-
-Run C<texmine help> for more options
-
-=head1 DESCRIPTION
-
-texmine is a script to quickly inspect the contents of a LaTeX file,
-such as image references, URLs, table of contens and citations.
-
-=head1 SUBROUTINES/METHODS
-
-
-=head2 img_cmd
-
-=cut
 
 sub img_cmd {
 	my $c = shift;
@@ -42,9 +17,6 @@ sub img_cmd {
 	return _exec_cmd(\&img,$files);
 }
 
-=head2 img
-
-=cut
 
 
 sub img {
@@ -64,9 +36,6 @@ sub img {
 }
 
 
-=head2 url_cmd
-
-=cut
 
 sub url_cmd {
 	my $c = shift;
@@ -74,9 +43,6 @@ sub url_cmd {
 	return _exec_cmd(\&url,$files);
 }
 
-=head2 url
-
-=cut
 
 sub url{
 	my $file = shift;
@@ -95,9 +61,6 @@ sub url{
 	return join "\n",@$res;
 }
 
-=head2 bib_cmd
-
-=cut
 
 sub bib_cmd {
 	my $c = shift;
@@ -105,9 +68,6 @@ sub bib_cmd {
 	return _exec_cmd(\&bib,$files);
 }
 
-=head2 bib
-
-=cut
 
 sub bib {
 	my $file = shift;
@@ -126,9 +86,6 @@ sub bib {
 	return join "\n",@$res;
 }
 
-=head2 index_cmd
-
-=cut
 
 sub index_cmd {
 	my $c = shift;
@@ -136,9 +93,6 @@ sub index_cmd {
 	return _exec_cmd(\&index,$files);
 }
 
-=head2 index
-
-=cut
 
 sub index {
 	my $file = shift;
@@ -183,6 +137,49 @@ sub _exec_cmd {
 	return $res;
 }
 
+
+1; # End of App::TeXMine
+
+__END__
+=pod
+
+=head1 NAME
+
+App::TeXMine - extract information from LaTeX files
+
+=head1 VERSION
+
+version 0.01_06
+
+=head1 SYNOPSIS
+
+texmine command file.tex
+
+Run C<texmine help> for more options
+
+=head1 DESCRIPTION
+
+texmine is a script to quickly inspect the contents of a LaTeX file,
+such as image references, URLs, table of contens and citations.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 img_cmd
+
+=head2 img
+
+=head2 url_cmd
+
+=head2 url
+
+=head2 bib_cmd
+
+=head2 bib
+
+=head2 index_cmd
+
+=head2 index
+
 =head1 AUTHOR
 
 Andre Santos, C<< <andrefs at cpan.org> >>
@@ -209,7 +206,16 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
+=head1 AUTHOR
+
+Andre Santos <andrefs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andre Santos.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-1; # End of App::TeXMine

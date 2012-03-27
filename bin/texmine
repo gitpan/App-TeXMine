@@ -28,15 +28,31 @@ sub index
 	return $c->index_cmd;
 }
 
+
+# ABSTRACT: extract information from LaTeX files
+# PODNAME: texmine
+
+
+__END__
+=pod
+
 =head1 NAME
-  
+
 texmine - extract information from LaTeX files
+
+=head1 VERSION
+
+version 0.01_06
 
 =head1 SYNOPSIS
 
 texmine [command] file.tex
 
 Run C<texmine help> for more options.
+
+=head1 NAME
+
+texmine - extract information from LaTeX files
 
 =head1 COMMANDS
 
@@ -76,4 +92,16 @@ Copyright 2012 Andre Santos.
 
 Andre Santos
 
+=head1 AUTHOR
+
+Andre Santos <andrefs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andre Santos.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
+
