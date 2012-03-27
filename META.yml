@@ -20,4 +20,8 @@ requires:
   perl: v5.14.1
   strict: 0
   warnings: 0
-version: 0.01_06
+resources:
+  bugtracker: https://github.com/andrefs/App-TeXMine/issues
+  homepage: https://github.com/andrefs/App-TeXMine
+  repository: git://github.com/andrefs/App-TeXMine.git
+version: 0.01_07

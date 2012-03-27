@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 package App::TeXMine;
 {
-  $App::TeXMine::VERSION = '0.01_06';
+  $App::TeXMine::VERSION = '0.01_07';
 }
 use warnings;
 use feature 'say';
@@ -149,7 +149,7 @@ App::TeXMine - extract information from LaTeX files
 
 =head1 VERSION
 
-version 0.01_06
+version 0.01_07
 
 =head1 SYNOPSIS
 
