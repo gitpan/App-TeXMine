@@ -24,4 +24,4 @@ resources:
   bugtracker: https://github.com/andrefs/App-TeXMine/issues
   homepage: https://github.com/andrefs/App-TeXMine
   repository: git://github.com/andrefs/App-TeXMine.git
-version: 0.01_13
+version: 0.01_14

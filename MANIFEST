@@ -5,6 +5,7 @@ META.yml
 Makefile.PL
 bin/texmine
 dist.ini
+ignore/ptru.tex
 lib/App/TeXMine.pm
 t/author-critic.t
 t/release-pod-coverage.t

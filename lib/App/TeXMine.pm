@@ -1,11 +1,8 @@
-
-use 5.014;
-use strict;
+use strict; use warnings;
 package App::TeXMine;
 {
-  $App::TeXMine::VERSION = '0.01_13';
+  $App::TeXMine::VERSION = '0.01_14';
 }
-use warnings;
 use feature 'say';
 
 # ABSTRACT: extract information from LaTeX files
@@ -28,12 +25,14 @@ sub img {
 		last if $line =~ m|\\end{document}| and ! $options->{a};
 	 	if ($line =~ /$imgpat/p) {
 			my $comm = ${^MATCH};
-			my $img = $comm =~ s/^.*?{(.*?)}/$1/r;
+			my $img = $comm;
+			$img =~ s/^.*?{(.*?)}/$1/;
 			push @$res,$img if $img;
 		}
 	}
 	close $fh;
-	return join "\n",@$res;
+	return 0+@$res if $options->{c};
+	return join "\n",(defined($options->{s}) ? sort { lc($a) cmp lc($b) } @$res : @$res);
 }
 
 
@@ -54,13 +53,15 @@ sub url{
 		last if $line =~ m|\\end{document}| and ! $options->{a};
 	 	if ($line =~ /$urlpat/p) {
 			my $comm = ${^MATCH};
-			my $url = $comm =~ s/^.*?{(.*?)}/$1/r;
+			my $url = $comm;
+			$url =~ s/^.*?{(.*?)}/$1/;
 			say $url;
 			push @$res,$url if $url;
 		}
 	}
 	close $fh;
-	return join "\n",@$res;
+	return 0+@$res if $options->{c};
+	return join "\n",(defined($options->{s}) ? sort { lc($a) cmp lc($b) } @$res : @$res);
 }
 
 
@@ -80,13 +81,14 @@ sub bib {
 		last if $line =~ m|\\end{document}| and ! $options->{a};
 	 	if ($line =~ /$citepat/p) {
 			my $comm = ${^MATCH};
-			my $cite = $comm =~ s/^.*?{(.*?)}/$1/r;
-			say foreach split /,/,$cite ;
-			push @$res,$cite if $cite;
+			my $cite = $comm;
+			$cite =~ s/^.*?{(.*?)}/$1/;
+			push @$res,(split /,/,$cite);
 		}
 	}
 	close $fh;
-	return join "\n",@$res;
+	return 0+@$res if $options->{c};
+	return join "\n",(defined($options->{s}) ? sort { lc($a) cmp lc($b) } @$res : @$res);
 }
 
 
@@ -107,12 +109,14 @@ sub index {
 		last if $line =~ m|\\end{document}| and ! $options->{a};
 		if ($line =~ /$chpat/p) {
 			my $comm = ${^MATCH};	
-			my $chap = $comm =~ s/^.*?{(.*?)}/$1/r;
+			my $chap = $comm;
+			$chap =~ s/^.*?{(.*?)}/$1/;
 			$res.="$chap\n";
 		}
 		if ($line =~ /$secpat/p){
 			my $comm = ${^MATCH};	
-			my $sec = $comm =~ s/^.*?{(.*?)}/$1/r;
+			my $sec = $comm;
+			$sec =~ s/^.*?{(.*?)}/$1/;
 			my $tabs = 0;
 	
 			$tabs++ while ($comm =~ s/sub//g);
@@ -153,7 +157,7 @@ App::TeXMine - extract information from LaTeX files
 
 =head1 VERSION
 
-version 0.01_13
+version 0.01_14
 
 =head1 SYNOPSIS
 

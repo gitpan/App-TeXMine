@@ -1,6 +1,15 @@
 Changelog for App-TeXMine
 
-0.01_13 2012-04-21T15:51:05
+0.01_14 2012-04-21T17:50:53
+ [André Santos <andrefs@cpan.org>]
+ - added -c option to count output lines (like grep's -c)
+
+ - added -s option to sort output
+
+ - droped perl 5.14 dependency by refactoring out /r modifier
+
+
+v0.01_13 2012-04-21T15:51:00
  [André Santos <andrefs@cpan.org>]
  - minor fix in POD
 

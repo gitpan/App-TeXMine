@@ -1,0 +1,728 @@
+%This is a template for producing OASIcs articles.
+%See oasics-manual.pdf for further information.
+
+\documentclass[a4paper,russian,UKenglish]{oasics}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{fancyvrb}
+\usepackage{pifont}
+
+  %for A4 paper format use option "a4paper", for US-letter use option "letterpaper"
+  %for british hyphenation rules use option "UKenglish", for american hyphenation rules use option "USenglish"
+
+%\usepackage{microtype}%if unwanted, comment out or use option "draft"
+
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+\def\pfunc#1{\hookrightarrow {#1}}        % partial funct.
+\def\PROD{\begin{array}[t]{rclc}}
+\def\TYPE{&:&}
+\def\NEXT{&\times \\}
+\def\DORP{\end{array}}
+
+\def\mycong{$\ \cong \ $}
+\def\pt{$_{pt}$}
+\def\en{$_{en}$}
+\def\ru{$_{ru}$}
+
+\def\UC{unambiguous-concept}
+\def\UCTS{\UC{} translation sets}
+\def\UCTSS{{\sc UCTS}}
+\def\TU{TU}
+
+\def\PTD{probabilistic translation dictionaries}
+\def\PTDS{{\sc PTDs}}
+
+\def\BWS{bi-word sets}
+\def\BWSS{{\sc BWS}}
+
+\def\TMXS{{\sc TMXs}}
+
+\bibliographystyle{plain}% the recommended bibstyle
+
+% Author macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Bootstrapping PT-RU bilingual resources}
+%\titlerunning{A Sample OASIcs Article} %optional, in case that the title is too long; the running title should fit into the top page column
+
+\author[1]{André Santos}
+\author[2]{Alberto Simões}
+\author[3]{José João Almeida}
+\author[4]{Nuno Carvalho}
+\affil[1]{Departamento de Informática, Universidade do Minho\\
+         Campus de Gualtar, 4710-057 Braga, PORTUGAL\\
+		\texttt{andrefs@cpan.org}}
+\affil[2]{Centro de Estudos Humanísticos, Universidade do Minho\\
+  		Campus de Gualtar, 4710-057 Braga, Portugal\\
+    	\texttt{ambs@ilch.uminho.pt}}
+\affil[3]{Departamento de Informática, Universidade do Minho\\
+         Campus de Gualtar, 4710-057 Braga, PORTUGAL\\
+		\texttt{jj@di.uminho.pt}}
+\affil[4]{Departamento de Informática, Universidade do Minho\\
+         Campus de Gualtar, 4710-057 Braga, PORTUGAL\\
+		\texttt{narcarvalho@di.uminho.pt}}	
+%\authorrunning{A. Santos, A. Simões, J.J. Almeida and N. Carvalho}%optional. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et. al.'
+
+\Copyright[nc-nd]%choose "nd" or "nc-nd"
+          {André Santos, Alberto Simões, José João Almeida and Nuno Carvalho}
+
+\subjclass{I.2.7 Natural Language Processing}
+\keywords{Bilingual Resources, Machine Translation, Parallel Corpora}
+
+%Editor-only macros (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\serieslogo{}%please provide filename (without suffix)
+\volumeinfo%(easychair interface)
+  {Billy Editor, Bill Editors}% editors
+  {2}% number of editors: 1, 2, ....
+  {Conference/workshop/symposium title on which this volume is based on}% event
+  {1}% volume
+  {1}% issue
+  {1}% starting page number
+\EventShortName{}
+\DOI{10.4230/OASIcs.xxx.yyy.p}% to be completed by the volume editor
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  The task of gathering bilingual resources between Portuguese and
+  Russian languages is difficult. This is not only true given the lack
+  of resources between these two languages, but also given the
+  differences on the alphabet, the language, and the culture.
+
+  In this article we propose a bootstrapping approach to build
+  bilingual resources between these two languages, using the few
+  resources available, and trying to use triangulation approaches in
+  order to create new resources.
+
+  We were able to produce different kind of resources, \emph{\UCTS},
+  \emph{\BWS} and \emph{\PTD}, each one with some different level of
+  confidence from each other.  These resources were used in the
+  synchronization, alignment and assessment activities.
+ \end{abstract}
+
+\section{Introduction}
+
+
+
+It is well known that several activities depend heavily on the
+existence of bilingual (multilingual) language resources. The
+paradigmatic area is machine translation, but computer-assisted
+translation can take advantage of bilingual resources as well,
+specially when we include in these resources bilingual dictionaries or
+terminology. Information Retrieval is no longer centered in
+monolingual document retrieval, but systems should use multilingual
+resources and retrieve documents in different languages (see Cross
+Language Evaluation Forum initiatives). Even other areas, like
+contrastive language studies, can use bilingual resources.
+
+Some languages pairs are reasonably well represented in the available
+public bilingual resources. This is the case of many language pairs
+from European Union --- because there is a large set of bitexts and
+parallel corpora with sources coming from the European Parliament and
+European Laws
+\cite{Koehn2005,perfide,SteinbergerPouliquenWidigerEtAl2006}. Some
+other pairs, like Portuguese and Russian, do not have such a
+quantity of resources available. For example, visiting
+OPUS~\cite{Tiedemann:RANLP5}, only a few of the available corpora
+includes both Russian and Portuguese, and most of them are small (like
+the KDE internationalization messages) and some other can have some
+quality issues (like the alignment of free user-created movies
+subtitles).
+
+This works appeared in the context of project Per-Fide involving the
+construction of multilingual resources for several pairs of languages
+(Portuguese, English, Russian, French, Italian, German and Spanish).
+Most of the problems discussed here apply to all the language
+pairs. 
+In this article we will discuss our activities related to the creation
+of bilingual resources for the Portuguese--Russian language pair (the most
+difficult situation in the above-mentioned project). Our
+work goes from the bitext alignment, \PTD{} extraction, and the
+construction of \UCTS{} and \BWS, whose we will define shortly.\\
+
+In the next sections we start from:
+ .1 describing the specific difficulties of PT-RU language pair;
+ .2 next we present the concepts of \PTD{}, \UCTS{} and \BWS;
+ .3 after that we discus the bootstrapping approach used and the specific 
+  tools used in the process (heterogeneous algebra of \PTDS, \UCTSS, \BWSS\ and \TMXS)
+ .4 then we present a case-study and the results obtained.
+#
+
+
+\subsection{Portuguese -- Russian difficulties}
+
+Until recently most of the translations between Portuguese and Russian
+were not direct: translators often used English and/or French as an
+intermediate language (that is, using these translations as originals,
+instead of the Russian documents). This means that many bitexts are
+comparable texts instead of parallel texts.
+
+Unfortunately that is not the only problem when working with this pair
+of languages. There are several problems related with the processing
+of Portuguese/Russian bitexts:
+\begin{itemize}
+\item there is a small set of speakers that understand simultaneously
+  the Portuguese and Russian languages;
+\item there is a small set of Portuguese/Russian bitexts, and a
+  smaller set of these documents are real direct translations;
+\item the two languages do not share the alphabet (Cyrillic vs Latin
+  characters);
+\item there are big differences in the language structure and
+  morphological characteristics;
+\item there are differences in the culture.
+\end{itemize}
+
+Also, most of the usual techniques to compute alignments between two
+languages can not be used for this pair of languages. 
+In order to find connections between texts, alignment tools usually use:
+\begin{itemize}
+\item sentence length;
+\item common words and cognates relations;
+\item non-textual elements, including punctuation and numbers;
+\item auxiliary provided word-pair lists.
+\end{itemize}
+
+In the alignment process, the lack of a common alphabet makes it
+impossible to use common words and cognates relations. Also, in a new
+alignment project, word-pair lists are rarely available (and generic
+word-pair lists does not help much).
+
+Additionally, Russian and Portuguese conventions and backgrounds are
+very different, which often results in different introductions,
+preambles, footnotes, author biographies, chronologies, etc.  We also
+witnessed differences related with the necessity of explaining
+translation decisions (translations notes): when the differences
+between languages and cultures are bigger, the number of translation
+notes increases accordingly. All these differences and the lack of
+strong clues often lead to bad alignments.
+
+In order to achieve better results we propose a bootstrapping approach
+based on the following steps:
+\begin{enumerate}
+\item first, calculate a set of synchronization points (based on
+  \UCTS{} and partial alignments);
+\item use structural alignment techniques whenever possible;
+\item triangulate \PTD{} to obtain initial \PTD{} in order to
+  calculate \UCTS{} and \BWS.
+\end{enumerate}
+
+\subsection{Basic concepts}
+
+This section describes some concepts (some of them already mentioned)
+that will be used in this document.
+
+\subsubsection*{PTD:  \PTD}
+
+Probabilistic translation dictionaries are a kind of word alignment,
+usually extracted automatically from parallel corpora. Although they
+can be extracted using any kind of word aligners (like
+NATools~\cite{sepln2003} or GIZA++~\cite{och2000improved}), they where
+introduced by NATools toolkit and related publications. Please refer
+to any of these or other word alignment articles for the algorithms
+involved.
+
+A probabilistic translation dictionary from a source language ${\cal
+  A}$ to a target language ${\cal B}$ is a mapping from words $w_i \in
+{\cal A}$ to their probable translations $t_{i,j}\in {\cal B}$. This
+mapping is annotated with a score or probability value. Formally, a
+PTD can be defined as shown in
+equation~\ref{eq:ptd}. Figure~\ref{fig:ptd} also shows a typical PTD
+entry.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tabular}{p{.48\textwidth}p{.48\textwidth}}
+    \hline
+    \textbf{Typical PTD entry:} & \textbf{Formal PTD definition:}  \\
+    \begin{minipage}{1.0\linewidth}
+      $${\cal T}\left(\hbox{codificada}\right) =
+      \left\{
+        \begin{matrix}
+          \hbox{codified}\quad 62.83\%\cr
+          \hbox{uncoded}\hfill 13.16\%\cr
+          \hbox{coded}\hfill 6.47\%\cr
+          \ldots\hfill\null
+        \end{matrix}
+      \right.
+      $$
+    \end{minipage}
+    &
+    \begin{minipage}{1.0\linewidth}
+      \begin{equation}
+        \label{eq:ptd}
+        \begin{array}{lcll}
+          PTD & \cong & langA \pfunc{info}  \\
+          info & \cong & 
+          \PROD count \TYPE int \NEXT trans \TYPE trans \DORP
+          \\
+          trans & \cong & langB \pfunc{prob}  \\
+          langA & \cong & term  \\
+          langB & \cong & term  \\
+        \end{array}
+      \end{equation}
+    \end{minipage}\\&\\
+    \hline
+  \end{tabular}
+  \caption{PTD formal definition and PTD entry example.}
+  \label{fig:ptd}
+\end{figure}
+
+In the context of this work, \PTD\ are used for a set of different
+tasks, including:
+\begin{itemize}
+\item obtaining lists of \UCTSS{} candidates;
+\item obtaining lists of \BWS{} candidates;
+\item calculating new \PTD;
+\item assessment of alignment correctness.
+\end{itemize}
+
+In interesting feature of \PTD{} is that they can be composed (or
+triangulated) with relatively interesting results (for higher
+probability and occurrence words). A detailed description and
+evaluation is presented at \cite{fala2010-tri}.
+
+\subsubsection*{UCTS: \UCTS}
+
+There are some terms or words that does not have much ambiguity, and
+we can expect that their translation is always (or almost) the
+same. We call to them \emph{unambiguous concepts}. Examples include
+proper names (London\en \mycong Londres\pt; Oporto\en, Porto\en
+\mycong Porto\pt), technical terminology (file\en \mycong ficheiro\pt;
+folder\en,directory\en \mycong pasta\pt,directoria\pt), months,
+seasons, week days, numerals, cardinals, etc.
+
+As shown above, sometimes we have more than one word or term
+representing these concepts, either because there is more than one way
+to write a term, there are some possible synonyms (wolfram\en,
+tungsten\en \mycong volfrâmio\pt, tungsténio\pt), or because there are
+some morphological agreement constraints that need to be kept (like
+Russian proper noun declination: Israel\pt \mycong
+{ \selectlanguage{russian} Израиль\ru, Израилем\ru, Израиля\ru,
+Израилю\ru )}.
+
+%% ALBIE HERE
+
+A \UC{} translation pair for two languages \textit{L1} and \textit{L2} is 
+then defined as a pair of sets, one containing terms from \textit{L1} and 
+the other containing terms from \textit{L2}. Terms from each set are either 
+synonyms and can be used interchangeably, or are morphological variants of 
+the same term. 
+
+An \UCTS{} for two languages \textit{L1} and \textit{L2} can be 
+formally defined as follows:
+$$(term*)_{L1} = (term*)_{L2}$$
+
+Each term may appear only once in the \UCTS.
+Terms can be multiword units.
+
+This concept is similar to the \emph{entry concept} used in terminology areas.
+
+In the context of this work, \UCTS{} are used for:
+  . partial synchronization/alignment
+  . assessment of alignment of bitexts (in the translation sector, terminology
+is also used for quality assurance)
+#
+
+\UCTS{} can be obtained by several ways:
+  . exported/extracted from other similar resources;
+  . extracted from \PTDS;
+  . produced manually.
+  #
+
+
+\subsubsection*{BWS: \BWS}
+
+As said before, in the alignment process the existence of
+auxiliary provided word-pair lists improves the alignment quality -- because
+it gives an extra connection clues.
+
+These bi-words sets (\BWSS) are crucial for situations where common words and cognate 
+techniques are not applicable (such as PT-RU alignments -- because they have different
+alphabets).
+
+A bi-words set is a collection of strongly related word pairs.
+Each Bi-word $word_{L1},word_{L2}$ tell us that $word_{L2}$ is a possible translation
+of $word_{L1}$ (we may have others).
+
+$word_{Li}$ may have several meanings (may be ambiguous), may appear in more the one
+pair.
+
+Bi-Words sets are topically much larger then \UCTSS. 
+A Bi-Words set relation is not as strong as the \UCTSS{} relation. 
+
+In the context of this work, \BWSS{} are used for:
+  . Improve the quality of the bitext alignment process;
+  . assessment of alignments.
+#
+
+\BWSS{} can be obtained by several ways:
+  . exported/extracted from other similar resources, like dictionaries.
+  . extracted from \PTDS,
+  . produced manually.
+  #
+
+%% \subsection{Project goals}
+
+\section{Bootstrapping PT-RU resources}\label{sec:boot_ptru}
+
+The initial tentatives of directly align bi-books PT-RU using hunalign~\cite{varga2005parallel}
+and cwb-align~\cite{ims} obtained very poor results.\\
+
+In order to obtain a good aligner it is necessary to have
+some resources that are obtained from resources calculated with him.
+
+To break the dependence cycle we create a initial BWs and UCTs and
+use a bootstrapping approach (see Algorithm~\ref{alg:boot}),
+
+\begin{algorithm}
+\DontPrintSemicolon
+   \caption{Bootstrapping\label{alg:boot}}
+
+Create a initial $PTD_{pt-ru}$\;
+Create a initial BWs and UCTs...\;
+
+\Repeat{quality is good enough}{
+ Aligned Bitexts $ \gets $ align($T_{pt},T_{ru}$) using(BWs,UCTs)\;
+ $PTD_{pt-ru}      \gets $ create\_ptd(Aligned Bitexts)\;
+ BWs              $\gets $ extract\_bw($PTD_{pt-ru}$)\;
+ BWs              $\gets $ improve\_bw( BWs, Aligned Bitexts)\;
+ UCTs             $\gets $ extract\_uct($PTD_{pt-ru}$)\;
+ UCTs             $\gets $ improve\_uct(UCTs, Aligned Bitexts)\;
+}
+\end{algorithm}
+
+
+The creation of $PTD_{pt-ru}$ was done by:
+  .1 calculating a PTD with a small corpus PT-RU and 
+  .2 using the corpora(PT,EN) and corpora(EN,RU) by composition 
+ of the correspondent $PTD_{pt-en}$ with $PTD_{en-ru}$
+  .3 using Wikipedia, creating a parallel corpus with the (often multiword) terms
+ the have translations PT and RU; and calculating the correspondent $PTD_{pt-ru}$ 
+  #
+
+The creation of initial BWs and UCTs was done by using PTDs-to-BWs and PTDs-to-UCTs
+tools (that are discussed in the following sections) and selecting the elements 
+that appear in the active problem domains: BWs and UCTs that were found in the books to be aligned.
+
+\begin{figure*}
+\includegraphics[width=0.9\textwidth]{img/esquema}
+\caption{Bootstrapping PT-RU}
+\end{figure*}
+
+
+
+
+\subsection{From \PTDS{} to \UCTSS}
+The TMX obtained from an alignment can be used to generate a PTD, which in turn can be used to extract an UCTS. This UCTS has the advantage of being created without requiring anything else other than the PTD derived from the original documents, and of being tailored specifically for the documents aligned, not containing any unused terms. Algorithm~\ref{alguctsbws} describes the extraction of an UCTS from a PTD.
+
+\begin{algorithm}
+   \small
+   \DontPrintSemicolon
+   \caption{Calculate a unambiguous-concept equivalent set from a PTD pair.\label{alguctsbws}}
+   \KwIn{$ptd_A, ptd_B : PTD$}
+   \KwIn{$ occur_{min}, occur_{max}: Integer$}
+   \KwIn{$prob_{min}, prob_{max}: Float$}
+   \KwOut{$result : \textit{Unambiguous-concept equivalent Set}$}
+   \SetKwFunction{add}{add}
+   \BlankLine
+
+   \ForAll{$word \in ptd_A$}{
+       $translations \leftarrow ptd_A.translate(word)$\;
+       \ForAll{$t \in translations$}{
+       $p \leftarrow ptd_A.probability(word, t)$\;
+       $p_i \leftarrow ptd_B.probability(t, word)$\;
+       \If{$occur_{min} > ptd_A.count(word) > occur_{manx} \wedge p > prob_{min} \wedge p_i < prob_{max}$}{
+           $result_A \leftarrow result_A \cup (word, t, p * p_i)$ \hfill \textit{// add new pair to $ptd_A$ result}}
+       }
+   }
+   \ForAll{$word \in ptd_B$}{
+       $translations \leftarrow ptd_B.translate(word)$\;
+       \ForAll{$t \in translations$}{
+       $p \leftarrow ptd_B.probability(word, t)$\;
+       $p_i \leftarrow ptd_A.probability(t, word)$\;
+       \If{$occur_{min} > ptd_B.count(word) > occur_{manx} \wedge p > prob_{min} \wedge p_i < prob_{max}$}{
+           $result_B \leftarrow result_B \cup (t, word, p * p_i)$ \hfill \textit{// add new pair to $ptd_B$ result}}
+       }
+   }
+	$result \leftarrow result_A \sqcup result_B$ \hfill \textit{// the final set is a list of the union of pairs found for each PTD}
+\end{algorithm}
+
+\subsection{From \PTDS{} to \BWSS}
+
+In order to select (good) biwords from PTDs we must select the strong 
+dictionary correspondences.
+Algorithm~\ref{alg:bws} describes how this set is calculated from a 
+PTD pair.
+
+There a number of constants and restrictions that can be used to
+control the size and quality of final \BWSS{}: the minimum number of occurrences,
+minimum probability, selecting one single simetric \BWSS{} or two oriented \BWSS{}, etc.
+
+\begin{algorithm}
+   \small
+   \DontPrintSemicolon
+   \caption{Calculate a bi-word set from a PTD pair.\label{alg:bws}}
+   \KwIn{$ptd_A, ptd_B : PTD$}
+   \KwIn{$ occur_{min}: Integer$}
+   \KwIn{$prob_{min}: Float$}
+   \KwOut{$result : \textit{Bi-Word Set}$}
+   \SetKwFunction{add}{add}
+   \BlankLine
+   $result \leftarrow \emptyset$ \hfill \textit{// start with an empty set}\;
+   \ForAll{$word \in ptd_A$}{
+       $translations \leftarrow ptd_A.translate(word)$\;
+       \ForAll{$t \in translations$}{
+       $p \leftarrow ptd_A.probability(word, t)$\;
+       \If{$( ptd_A.count(word) > occur_{min} ) \wedge ( p > prob_{min} )$}{
+           $result \leftarrow result \cup (word, t, p)$ \hfill \textit{// add new pair to final set}}
+       }
+   }
+   \ForAll{$word \in ptd_B$}{
+       $translations \leftarrow ptd_B.translate(word)$\;
+       \ForAll{$t \in translations$}{
+       $p \leftarrow ptd_B.probability(word, t)$\;
+       \If{$( ptd_B.count(word) > occur_{min} ) \wedge ( p > prob_{min} )$}{
+           $result \leftarrow result \cup (t, word, p)$ \hfill \textit{// add new pair to final set}}
+       }
+   }
+\end{algorithm}
+
+%\subsection{From Bitext to \PTDS}
+
+
+%% FIXME -- missing
+
+\subsection{Synchronization and partial alignment}
+\label{pa_ucts}
+Delimiting sections in books before alignment helps to identify sections which only exist in one of the versions, to define anchor points to guide the alignment, or even to compare the books sections to assess their \textit{alignability}. 
+
+The sectioning process can be performed using the \texttt{Text::Perfide::BookCleaner} Perl library~\cite{santos2011bookcleaner,andre2011building}, which works based on an ontology containing common section names and patterns in several languages. This section delimitation can later be used to perform book synchronization.
+
+Another way of finding anchor points in bitexts is by using 
+\UCTSS. In fact, \UCTSS\ sets and non-textual elements that have a low 
+number of occurrences can be used to calculate synchronization 
+points in long bitexts. The partial alignment algorithm was
+implemented in \texttt{partialAlign.py}, a helper script bundled with
+\texttt{hunalign}~\cite{varga2005parallel}, and has been extended to 
+use \UCTSS{}~\cite{santos2012structural}.
+
+These synchronization points help to prevent the aligner
+from loosing its pace, which in turn results in an improvement
+on the quality of the alignments.
+
+\subsection{Alignment with \BWSS}
+
+As we said before, when aligning texts with different alphabets,
+the alignment tools have a difficult task: they have (almost) a single 
+clue to calculate correspondences -- the length of the sentences.
+
+If the texts have an extra preamble or biography note, it is easy to
+obtain bad alignments -- the alignment of PT-BR tends to be not robust.
+
+With the help of \BWSS{} the quality improves in a significant way.
+
+\subsection{Alignment quality comparison with \UCTSS}
+\label{sec:alignqual}
+
+\UCTSS{} are often used in translation quality check tools to measure
+translation terminology verification.
+
+By definition, the translation of 
+these elements is highly injective: if a term belonging to one side of an 
+equivalent set is present in a variant of a translation unit (TU), one of 
+the terms in the other side of the same set should be present in the other 
+variant of the TU.
+We called this occurrence a \textit{positive match}; a \textit{negative 
+match} occurs when one term is found in a TU variant, but a corresponding 
+term is missing in the other variant.
+
+The number of positive and negative matches in a TMX file can be calculated 
+as presented in Algorithm~\ref{alg:evalucts}, and used as a measure 
+of the overall quality of the alignment.
+
+\IncMargin{0.4cm}
+\begin{algorithm}
+  \small
+  \DontPrintSemicolon
+  \caption{TMX evaluation with UCTS\label{alg:evalucts}}
+  \KwIn{tmx:TMX file, ucts: \UCTS}
+  \KwOut{(pos,neg): total number of positive and negative occurrences}
+  \SetKwFunction{increment}{increment}
+  \BlankLine
+  \ForAll{$tu \in tmx$}{
+  	\ForAll{$word_{L1} \in tu_{L1}$}{
+		\If{$word_{L1} \in ucts$}{
+			$word_{L2}$ $\gets$ eqset\{$word_{L1}$\}\;
+			\If{$word_{L2} \in tu_{L2}$}{
+				\increment{pos}\;
+			}
+			\Else {
+				\increment{neg}\;
+			}
+		}
+	}
+  }
+\end{algorithm}
+\DecMargin{0.4cm}
+
+Given a number $M$ of positive matches of an UCTS in a bitext, a number $J1$ of terms only found in one of the versions and $J2$ of terms only found in the other, a numeric evaluation of the alignment can be obtained as follows:
+$$ quality = \frac{2*M}{(J1+J2)}$$
+Using this formula, a perfect alignment would result in a quality value of 1, and a completely failed alignment would result in a quality value of 0.
+
+%\subsection{Summarizing}
+
+%% \section{Project development} % \section{Implementation}
+
+\section{Case-study and measures}
+
+A set of seventeen books in Portuguese and their translation to Russian was put together to evaluate the methods previously described. This set included books originally written in French, English, Portuguese and Italian, from authors such as Jules Verne, Alexandre Dumas, Eça de Queirós and Umberto Eco.
+
+Eight copies of this set were created, and aligned under different conditions and with different steps of pre-processing. Then the alignments were evaluated using UCTS, following the process described in Section~\ref{sec:alignqual}. The evaluation results are summarized in Table~\ref{tab:aligncomp}.
+
+\begin{table}[htb]
+\centering
+\caption{Comparison of the quality of alignments of the same set of books under different conditions.}
+\label{tab:aligncomp}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+                   &\rule{0cm}{.5cm} \parbox{2cm}{\centering\textbf{Partial Alignment}} &   \textbf{Synchronization} &   \textbf{BWS}   & \parbox{2cm}{\centering\textbf{Bad alignments}} &   \textbf{Evaluation} \\\hline\hline
+ \textbf{Set A1}   &  \ding{55}                 &  \ding{55}                 &    \ding{55}     &        11               &     0.1144            \\
+ \textbf{Set A2}   &  \ding{55}                 &  \ding{55}                 &    \ding{51}     &         5               &     0.3283            \\
+ \textbf{Set A3}   &  \ding{55}                 &  \ding{51}                 &    \ding{55}     &         7               &     0.1808            \\
+ \textbf{Set A4}   &  \ding{55}                 &  \ding{51}                 &    \ding{51}     &         4               &     0.3009            \\
+ \textbf{Set A5}   &  \ding{51}                 &  \ding{55}                 &    \ding{55}     &        11               &     0.2355            \\
+ \textbf{Set A6}   &  \ding{51}                 &  \ding{55}                 &    \ding{51}     &         4               &     0.4323            \\
+ \textbf{Set A7}   &  \ding{51}                 &  \ding{51}\footnotemark[1] &    \ding{55}     &         8               &     0.2257            \\
+ \textbf{Set A8}   &  \ding{51}                 &  \ding{51}\footnotemark[1] &    \ding{51}     &         5               &     0.3581            \\\hline
+
+ \hline
+\end{tabular}
+\end{table}
+
+As this process was meant to evaluate only the improvements possible by using \BWS{}, partial alignment an synchronization, the \UCTSS{} and \BWS{} were not bootstrapped: the \UCTSS{} used was the one referred in Section~\ref{sec:boot_ptru}, and the \BWS{} was gathered from other resources instead.
+
+\footnotetext[1]{In these cases, partial alignment was performed at section level instead of actual synchronization.}
+
+Additional \BWS{} was extracted from two PTDs: one built from the triangulation of a $PTD_{pt-en}$ and a $PTD_{en-ru}$, an another built from a $PTD_{pt-ru}$ built from a Portuguese-Russian corpus. Table~\ref{tab:bwscomp} presents the results of the alignments with the previously used \BWS{}, the newly created ones, and a merge of all three.
+
+\begin{table}[htb]
+\centering
+\caption{Comparison of the quality of alignments performed with \BWS{} from distinct sources.}
+\label{tab:bwscomp}
+\begin{tabular}{|l|l|r|c|c|}
+\hline
+       & \textbf{BWS}              & {\parbox{2cm}{\centering\textbf{Number of BWS}}}&\rule{0cm}{.5cm}{\parbox{2cm}{\centering\textbf{Bad alignments}}} &   \textbf{Evaluation} \\\hline\hline
+Set B0 & None                      &     --                    &                       11                                         &         0.1144        \\
+Set B1 & 3rd party                 &     25701                 &                        5                                         &         0.3283        \\
+Set B2 & Corpus$_{PT-RU}$          &    238611                 &                        6                                         &         0.2948        \\
+Set B3 & Triangulated$_{PT-EN-RU}$ &     82583                 &                        9                                         &         0.2212        \\
+Set B4 & All                       &    346895                 &                        3                                         &         0.4476        \\\hline
+\end{tabular}
+\end{table}
+
+To evaluate the bootstrapping techniques, the same initial set was first aligned without the help of any \BWS{}, \UCTSS{} or partial alignment. A PTD was created from the resulting TMX, and UCTS and BWS were extracted and used to re-align. The process was repeated several times, and the results can be found in Table~\ref{tab:bootstrap}\footnotemark[2].
+
+\footnotetext[2]{Due to time constraints, the evaluation of the bootstrapping approach is not quite ready yet, and will be provided in the final version of the paper.}
+
+\begin{table}[htb]
+\centering
+\caption{Consecutive alignments with bootstrapped resources.}
+\label{tab:bootstrap}
+\begin{tabular}{|l|c|c|c|}
+\hline
+                 & \textbf{UCTS} &   \textbf{BWS}   &   \textbf{Evaluation} \\\hline\hline
+\textbf{Set C}   &    --         &      --          &     0.1143            \\
+\textbf{Set C2}  &               &                  &                       \\
+\textbf{Set C3}  &               &                  &                       \\\hline
+
+ \hline
+\end{tabular}
+\end{table}
+
+
+\section{Conclusions and future work}
+The ammount of resources available for language pairs such as Portuguese-Russian is smaller than for other more closely-related languages. In addition to not being traditionally very related to each other, the fact that they use a different alphabet from each other means that not only the resources are scarce, but they are also more difficult to create or extract.
+
+In the case of bitext alignment, the results obtained can be improved by using several different techniques, such as synchronization, partial alignment, or providing the aligner with \BWS{}. Synchronization and partial alignment both work by finding anchor points before the alignment allows to help the aligner not to lose its pace. These anchor points can be detected either by finding the books section (synchronization), or by using \UCTSS{} (partial alignment).
+
+From a TMX file resulting from an alignment is possible to extract a PTD, which in turn can be used to generate both \BWS{} and \UCTSS{}. \UCTSS{} can be later used to determine the quality of other alignments.
+
+The cycle comprising the alignment of bitexts and the creation of PTDs, \UCTSS{} and \BWS{} can be used to bootstrap language resources, with each iteration of the cycle using the previously created resources to generate improved ones. A larger book set is currently being prepared to extensively test and perfect these bootstrapping mechanisms.
+
+\section{Acknowledgments}
+
+André Santos has a scholarship from Fundação para a Computação
+Científica Nacional and the work reported here has been partially
+funded by Fundação para a Ciência e Tecnologia through project
+Per-Fide PTDC/CLE-LLI/108948/2008. Alberto Simões has a post-doctoral
+grant by Fundação para a Ciência e Tecnologia with reference SFRH/BPD/73011/2010.
+
+% \cite{PTDs}
+% \cite{partialalign}
+% \cite{ims} % cwb
+% %\cite{cwb}
+% \cite{cwbalign}
+
+% %\cite{simoes2007parallel,simoes2006natserver,simoes2003natools} %natools
+
+% %%\cite{hunalign}
+
+% \cite{align}
+% \cite{winalign}
+
+
+\bibliography{bibtex}
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+\begin{lemma}[Lorem ipsum]
+Vestibulum sodales dolor et dui cursus iaculis. Nullam ullamcorper purus vel turpis lobortis eu tempus lorem semper. Proin facilisis gravida rutrum. Etiam sed sollicitudin lorem. Proin pellentesque risus at elit hendrerit pharetra. Integer at turpis varius libero rhoncus fermentum vitae vitae metus. \end{lemma}
+\begin{proof}
+Cras purus lorem, pulvinar et fermentum sagittis, suscipit quis magna.
+\end{proof}
+
+\subsection{Curabitur dictum felis id sapien}
+
+Curabitur dictum felis id sapien mollis ut venenatis tortor feugiat. Curabitur sed velit diam. Integer aliquam, nunc ac egestas lacinia, nibh est vehicula nibh, ac auctor velit tellus non arcu. Vestibulum lacinia ipsum vitae nisi ultrices eget gravida turpis laoreet. Duis rutrum dapibus ornare. Nulla vehicula vulputate iaculis. Proin a consequat neque. Donec ut rutrum urna. Morbi scelerisque turpis sed elit sagittis eu scelerisque quam condimentum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean nec faucibus leo. Cras ut nisl odio, non tincidunt lorem. Integer purus ligula, venenatis et convallis lacinia, scelerisque at erat. Fusce risus libero, convallis at fermentum in, dignissim sed sem. Ut dapibus orci vitae nisl viverra nec adipiscing tortor condimentum. Donec non suscipit lorem. Nam sit amet enim vitae nisl accumsan pretium. 
+
+\begin{lstlisting}[caption={Useless code},label=list:8-6,captionpos=t,float,abovecaptionskip=-\medskipamount]
+for i:=maxint to 0 do 
+begin 
+    j:=square(root(i));
+end;
+\end{lstlisting}
+
+\begin{itemize}
+\item Ut vitae diam augue. 
+\item Integer lacus ante, pellentesque sed sollicitudin et, pulvinar adipiscing sem. 
+\item Maecenas facilisis, leo quis tincidunt egestas, magna ipsum condimentum orci, vitae facilisis nibh turpis et elit. 
+\end{itemize}
+
+\section{Pellentesque quis tortor}
+
+Nec urna malesuada sollicitudin. Nulla facilisi. Vivamus aliquam tempus ligula eget ornare. Praesent eget magna ut turpis mattis cursus. Aliquam vel condimentum orci. Nunc congue, libero in gravida convallis, orci nibh sodales quam, id egestas felis mi nec nisi. Suspendisse tincidunt, est ac vestibulum posuere, justo odio bibendum urna, rutrum bibendum dolor sem nec tellus. 
+
+\begin{lemma} [Quisque blandit tempus nunc]
+Sed interdum nisl pretium non. Mauris sodales consequat risus vel consectetur. Aliquam erat volutpat. Nunc sed sapien ligula. Proin faucibus sapien luctus nisl feugiat convallis faucibus elit cursus. Nunc vestibulum nunc ac massa pretium pharetra. Nulla facilisis turpis id augue venenatis blandit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+\end{lemma}
+
+
+
+
+%% Local Variables:
+%%  ispell-local-dictionary: "english"
+%%  mode: flyspell
+%% End:
