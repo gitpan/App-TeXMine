@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 package App::TeXMine;
 {
-  $App::TeXMine::VERSION = '0.01_07';
+  $App::TeXMine::VERSION = '0.01_13';
 }
 use warnings;
 use feature 'say';
@@ -14,17 +14,18 @@ use feature 'say';
 sub img_cmd {
 	my $c = shift;
 	my $files = $c->argv;
-	return _exec_cmd(\&img,$files);
+	return _exec_cmd(\&img,$files,$c->options);
 }
 
 
 
 sub img {
-	my $file = shift;
+	my ($file,$options) = @_;
 	my $res = [];
 	my $imgpat  = qr/\\(?:includegraphics|pgfimage).*?{.*?}/;
 	my $fh = _open_file($file);
 	while (my $line = <$fh>){
+		last if $line =~ m|\\end{document}| and ! $options->{a};
 	 	if ($line =~ /$imgpat/p) {
 			my $comm = ${^MATCH};
 			my $img = $comm =~ s/^.*?{(.*?)}/$1/r;
@@ -40,16 +41,17 @@ sub img {
 sub url_cmd {
 	my $c = shift;
 	my $files = $c->argv;
-	return _exec_cmd(\&url,$files);
+	return _exec_cmd(\&url,$files,$c->options);
 }
 
 
 sub url{
-	my $file = shift;
+	my ($file,$options) = @_;
 	my $res = [];
 	my $urlpat  = qr/\\url{.*?}/;
 	my $fh = _open_file($file);
 	while (my $line = <$fh>){
+		last if $line =~ m|\\end{document}| and ! $options->{a};
 	 	if ($line =~ /$urlpat/p) {
 			my $comm = ${^MATCH};
 			my $url = $comm =~ s/^.*?{(.*?)}/$1/r;
@@ -65,16 +67,17 @@ sub url{
 sub bib_cmd {
 	my $c = shift;
 	my $files = $c->argv;
-	return _exec_cmd(\&bib,$files);
+	return _exec_cmd(\&bib,$files,$c->options);
 }
 
 
 sub bib {
-	my $file = shift;
+	my ($file,$options) = @_;
 	my $res = [];
 	my $citepat = qr/\\(?:no)?cite{.*?}/;
 	my $fh = _open_file($file);
 	while (my $line = <$fh>){
+		last if $line =~ m|\\end{document}| and ! $options->{a};
 	 	if ($line =~ /$citepat/p) {
 			my $comm = ${^MATCH};
 			my $cite = $comm =~ s/^.*?{(.*?)}/$1/r;
@@ -90,17 +93,18 @@ sub bib {
 sub index_cmd {
 	my $c = shift;
 	my $files = $c->argv;
-	return _exec_cmd(\&index,$files);
+	return _exec_cmd(\&index,$files,$c->options);
 }
 
 
 sub index {
-	my $file = shift;
+	my ($file,$options) = @_;
 	my $res;
 	my $secpat  = qr/\\(?:sub)*section{.*?}/;
 	my $chpat   = qr/\\chapter{.*?}/;
 	my $fh = _open_file($file);
 	while (my $line = <$fh>) {
+		last if $line =~ m|\\end{document}| and ! $options->{a};
 		if ($line =~ /$chpat/p) {
 			my $comm = ${^MATCH};	
 			my $chap = $comm =~ s/^.*?{(.*?)}/$1/r;
@@ -129,10 +133,10 @@ sub _open_file {
 }
 
 sub _exec_cmd {
-	my ($func,$files) = @_;
+	my ($func,$files,$options) = @_;
 	my $res;
 	foreach my $file (@$files){
-		$res.= $func->($file);
+		$res.= $func->($file,$options);
 	}
 	return $res;
 }
@@ -149,7 +153,7 @@ App::TeXMine - extract information from LaTeX files
 
 =head1 VERSION
 
-version 0.01_07
+version 0.01_13
 
 =head1 SYNOPSIS
 

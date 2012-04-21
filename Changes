@@ -1,6 +1,41 @@
 Changelog for App-TeXMine
 
-0.01_07 2012-03-27T14:13:55
+0.01_13 2012-04-21T15:51:05
+ [André Santos <andrefs@cpan.org>]
+ - minor fix in POD
+
+ - added -a option (process whole document instead of stopping in
+   \end{document})
+
+
+v0.01_12 2012-03-28T14:00:24
+ [André Santos <andrefs@cpan.org>]
+ - almost
+
+
+v0.01_11 2012-03-28T00:25:44
+ [André Santos <andrefs@cpan.org>]
+ - varios
+
+
+v0.01_10 2012-03-28T00:11:55
+ [André Santos <andrefs@cpan.org>]
+ - v0.01_10
+
+
+v0.01_09 2012-03-28T00:10:01
+ [André Santos <andrefs@cpan.org>]
+ - v0.01_08
+
+
+v0.01_07 2012-03-28T00:05:09
+ [André Santos <andrefs@cpan.org>]
+ - v0.01_07
+
+ - changes
+
+
+v0.01_06 2012-03-27T13:59:15
  [André Santos <andrefs@cpan.org>]
  - updated gitignore
 
@@ -8,8 +43,14 @@ Changelog for App-TeXMine
 
  - Migrated to Dist::Zilla
 
+
+v0.01_05 2012-03-24T16:04:27
+ [André Santos <andrefs@cpan.org>]
  - fixed github
 
+
+v0.01_04 2012-03-24T15:56:25
+ [André Santos <andrefs@cpan.org>]
  - added github to Build.PL
 
  - better documentation, link to github

@@ -3,11 +3,9 @@ LICENSE
 MANIFEST
 META.yml
 Makefile.PL
-README
 bin/texmine
 dist.ini
 lib/App/TeXMine.pm
 t/author-critic.t
-t/release-check-changes.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
