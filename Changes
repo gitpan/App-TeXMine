@@ -1,6 +1,11 @@
 Changelog for App-TeXMine
 
-0.01_14 2012-04-21T17:50:53
+0.01_15 2012-05-10T22:16:59
+ [André Santos <andrefs@cpan.org>]
+ - fixed bug in index (subsubsection)
+
+
+v0.01_14 2012-04-21T17:50:39
  [André Santos <andrefs@cpan.org>]
  - added -c option to count output lines (like grep's -c)
 

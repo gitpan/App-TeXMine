@@ -3,6 +3,7 @@ LICENSE
 MANIFEST
 META.yml
 Makefile.PL
+TODO
 bin/texmine
 dist.ini
 ignore/ptru.tex

@@ -1,7 +1,7 @@
 use strict; use warnings;
 package App::TeXMine;
 {
-  $App::TeXMine::VERSION = '0.01_14';
+  $App::TeXMine::VERSION = '0.01_15';
 }
 use feature 'say';
 
@@ -119,7 +119,7 @@ sub index {
 			$sec =~ s/^.*?{(.*?)}/$1/;
 			my $tabs = 0;
 	
-			$tabs++ while ($comm =~ s/sub//g);
+			$tabs = $comm =~ s/sub//g;
 			
 			$res.= "    "x$tabs;
 			$res.=" - $sec\n";
@@ -157,7 +157,7 @@ App::TeXMine - extract information from LaTeX files
 
 =head1 VERSION
 
-version 0.01_14
+version 0.01_15
 
 =head1 SYNOPSIS
 
